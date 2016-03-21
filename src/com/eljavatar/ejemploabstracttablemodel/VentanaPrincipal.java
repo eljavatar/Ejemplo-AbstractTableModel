@@ -1,9 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.eljavatar.ejemploabstracttablemodel;
+
+import java.awt.Component;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *
@@ -11,11 +14,52 @@ package com.eljavatar.ejemploabstracttablemodel;
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
 
+    private ModeloDatosTablaPersonas modeloTablaPersonas;
+
     /**
      * Creates new form VentanaPrincipal
      */
     public VentanaPrincipal() {
         initComponents();
+        setModeloTabla();
+    }
+
+    public ArrayList<Persona> obtenerPersonas() {
+        ArrayList<Persona> lista = new ArrayList();
+        lista.add(new Persona("Cod001", "Juan", 24, 5000.4));
+        lista.add(new Persona("Cod002", "Felipe", 27, 6700.8));
+        lista.add(new Persona("Cod003", "Diana", 31, 354.9));
+        lista.add(new Persona("Cod004", "María", 46, 5300));
+        lista.add(new Persona("Cod005", "Camilo", 28, 2890.6));
+        lista.add(new Persona("Cod006", "Pedro", 52, 1600.5));
+        lista.add(new Persona("Cod007", "Sandra", 43, 2000));
+        lista.add(new Persona("Cod008", "Esteban", 39, 752));
+        lista.add(new Persona("Cod009", "Pablo", 26, 2430.1));
+        lista.add(new Persona("Cod010", "Ana", 38, 3470.3));
+        return lista;
+    }
+
+    private void setModeloTabla() {
+        modeloTablaPersonas = new ModeloDatosTablaPersonas();
+        modeloTablaPersonas.setPersonas(obtenerPersonas());
+        this.jTpersonas.setModel(modeloTablaPersonas);
+        this.jTpersonas.getColumnModel().getColumn(3).setCellRenderer(new DecimalFormatRenderer());
+    }
+
+    static class DecimalFormatRenderer extends DefaultTableCellRenderer {
+        
+        private static DecimalFormatSymbols simbolos;
+        private static DecimalFormat formato;
+        
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            simbolos = new DecimalFormatSymbols();
+            simbolos.setDecimalSeparator(',');
+            simbolos.setGroupingSeparator('.');
+            formato = new DecimalFormat("#,##0.##", simbolos);
+            value = formato.format((Number) value);
+            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        }
     }
 
     /**
@@ -27,21 +71,75 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTpersonas = new javax.swing.JTable();
+        jBobtenerDatos = new javax.swing.JButton();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Ejemplo AbstractTableModel");
+        setResizable(false);
+
+        jTpersonas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Código", "Nombres", "Edad", "Valor Deuda"
+            }
+        ));
+        jScrollPane1.setViewportView(jTpersonas);
+
+        jBobtenerDatos.setText("Obtener Datos de Fila Seleccionada");
+        jBobtenerDatos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBobtenerDatosActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jBobtenerDatos)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jBobtenerDatos)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jBobtenerDatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBobtenerDatosActionPerformed
+        int fila = this.jTpersonas.getSelectedRow();
+        if (fila < 0) {
+            JOptionPane.showMessageDialog(this, "Debe Seleccionar una Fila", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        Persona persona = modeloTablaPersonas.getPersonas().get(fila);
+        String mensaje = "Datos de la Persona Seleccionada\n"
+                + "Código: " + persona.getCodigo() + "\n"
+                + "Nombre: " + persona.getNombres() + "\n"
+                + "Edad: " + persona.getEdad() + "\n"
+                + "Valor Deuda: " + persona.getValorDeuda();
+        JOptionPane.showMessageDialog(this, mensaje, "Datos", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_jBobtenerDatosActionPerformed
 
     /**
      * @param args the command line arguments
@@ -54,7 +152,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -79,5 +177,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jBobtenerDatos;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTpersonas;
     // End of variables declaration//GEN-END:variables
 }
